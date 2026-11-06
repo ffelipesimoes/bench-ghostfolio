@@ -1,0 +1,28 @@
+name: Claude Code Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: ["bench/claude/**"]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          show_full_output: true
+          prompt: |
+            Please review this pull request. Look for bugs, correctness issues,
+            and risks (especially around money/financial logic: balances, ledgers,
+            payments, refunds, currency conversion). Leave inline comments on the
+            specific lines you find issues with, explaining the concrete impact.
+            If you find no issues, say so briefly.
